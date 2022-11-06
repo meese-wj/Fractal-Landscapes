@@ -160,6 +160,9 @@ class TreeLandscape:
             level_height (float): Constant vertical shift between levels. Defaults to 1.0.
             boundary_factor (float): Numerical factor by which the boundary global maxima are greater than the tree's maximum. Defaults to 2.0.
         """
+        if boundary_factor <= 1.0:
+            raise ValueError("The boundary_factor must be greater than 1.0 for a well-defined energy landscape.")
+            
         self.boundary_factor = boundary_factor
         self.tree = treeclass(levels, minimum_height, level_height)
         return None
