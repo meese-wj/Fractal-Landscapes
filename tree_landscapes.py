@@ -39,7 +39,7 @@ class PointNode:
         maxstr = "max"
         if not self.ismax:
             maxstr = "min"
-        return "Node (" + maxstr + ") at (" + str(self.position[0]) + ", " + str(self.position[1]) + ")"
+        return "PointNode (" + maxstr + ") at (" + str(self.position[0]) + ", " + str(self.position[1]) + ")"
 
 class BinaryTree:
     """
