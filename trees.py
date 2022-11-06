@@ -35,32 +35,95 @@ class BinaryTree:
     will probably be deprecated.
 
     Attributes:
+        base (int): the k of the k-ary. For this tree is is always 2.
         levels (int): number of levels on the tree.
         minimum_height (float): value of the minima on the tree. Zero by default.
+        level_height (float): step value to separate levels on the tree. 1 by default.
         pointnodes (list of PointNodes): all the PointNodes on the tree.
     """
-    def __init__(self, levels, minimum_height = 0.0) -> None:
+    def __init__(self, levels, minimum_height = 0.0, level_height = 1.0) -> None:
         """
         Constructor for the BinaryTree.
 
         Parameters:
             levels (int): number of levels on the tree.
             minimum_height (float): value of the y-coordinate for all the minima. Zero by default.
+            level_height (float): constant vertical shift between levels. 1.0 by default.
         """
+        if (not type(levels) is int) or levels <= 0:
+            raise ValueError("The number of levels must be a positive integer.")
+
+        self.base = 2
         self.levels = levels
         self.minimum_height = minimum_height
+        self.level_height = level_height
         self.create_pointnodes()
         return None
+
+    def total_height(self) -> float:
+        return (self.levels + 1) * self.level_height
+
+    def total_width(self) -> float:
+        return self.base**(self.levels)
+
+    def nodes_per_level(self, level):
+        return self.base**level
     
     def create_pointnodes(self) -> None:
+        self.pointnodes = [ PointNode(True, 0.0, self.total_height()) ]
         
+        # Start at the bottom and build up
+        current_level = self.levels
+        # Collect a list of lists for the PointNodes
+        # on each level.
+        level_nodes = []
+        while current_level > 0:
+            current_nodes = []
+            if current_level == self.levels:
+                # The minimum levels have positions that 
+                # can most easily be established, so we
+                # start here.
+                half_nodes = self.nodes_per_level(current_level) // self.base
+                for ndx in range(0, self.nodes_per_level(current_level)):
+                    xpos = -0.5 * self.total_width() + ndx
+                    if ndx >= half_nodes:
+                        # Switch up the spacing around x = 0.0 to provide padding and
+                        # inversion symmetry along x.
+                        xpos = ndx % half_nodes + 1.0
+                    ypos = self.minimum_height
+                    current_nodes.append( PointNode(True, xpos, ypos) )
+            else:
+                # Now for each level above the minimum, we can find the
+                # x positions from the averages of the daughter nodes
+                daughter_nodes = level_nodes[self.levels - (current_level + 1)]
+                num_daughters = len(daughter_nodes)
+                for ndx in range(0, self.nodes_per_level(current_level)):
+                    # Map the current ndx index to the daughter indices
+                    left_index = self.base * ndx
+                    right_index = left_index + 1
+                    # Average the daughter x positions
+                    xpos = ( daughter_nodes[left_index].position[0] + daughter_nodes[right_index].position[1] ) / self.base
+                    # Add the level_height to the daughter y position
+                    ypos = daughter_nodes[left_index].position[0] + self.level_height
+                    current_nodes.append( PointNode(False, xpos, ypos) )
+
+            level_nodes.append(current_nodes)
+            current_level -= 1
+
+        # Add all nodes from the level_nodes to the position nodes
+        # Note that they *will be* out of x-order!
+        for lvl in level_nodes:
+            for pn in lvl:
+                self.pointnodes.append(pn)
+         
         return None
 
-    def export_pointnodes(self) -> tuple:
+    def export_pointnode_coordinates(self) -> list:
         """
-        Returns the x and y values of all the point nodes as separate lists.
+        Return a sorted tuple of the PointNode coordinates from the
+        binary tree. The sort is performed such that the x coordinates
+        are ordered.
         """
-        
         # Collect the tuples
         tup_values = []
         for pn in self.pointnodes:
@@ -69,6 +132,35 @@ class BinaryTree:
         # Sort them based on the xvalues
         tup_values.sort( key = lambda idx: tup_values.index(idx[0]) )
         
+        return tup_values
+        
+
+
+class TreeLandscape:
+
+    def __init__(self, treeclass, levels, minimum_height = 0.0, level_height = 0.0, boundary_factor = 2.0) -> None:
+        self.boundary_factor = boundary_factor
+        self.tree = treeclass(levels, minimum_height, level_height)
+        return None
+        
+    def export_landscape(self) -> tuple:
+        """
+        Returns the x and y values of all the point nodes as separate lists.
+
+        This function also attaches the global maximizing endpoints to make
+        the energy-landscape well-defined.
+
+        One should use this function to quickly generate the landscape.
+        """
+        tup_values = self.tree.export_pointnode_coordinates()
+
+        # Insert the global maxima with the same x-distance as defined by the BinaryTree part
+        left_xpos = tup_values[0][0] - (tup_values[1][0] - tup_values[0][0])
+        right_xpos = tup_values[-1][0] + (tup_values[-1][0] - tup_values[-2][0])
+        global_max = self.boundary_factor * self.total_height
+        tup_values.insert(0, (left_xpos, global_max))
+        tup_values.append( (right_xpos, global_max) )
+
         # Export the x and y values separately as lists
         xvalues = []
         yvalues = []
@@ -77,3 +169,4 @@ class BinaryTree:
             yvalues.append(tup[1])
         
         return (xvalues, yvalues)
+        
