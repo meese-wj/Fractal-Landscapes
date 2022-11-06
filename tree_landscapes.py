@@ -3,6 +3,10 @@ Source code for generating points on a k-ary tree.
 
 All trees are drawn in a 2D representation. That is,
 their nodes are only defined spatially by 2 coordinates.
+
+One should essentially only use the TreeLandscape class 
+to interface with this code. I see no reason to use the 
+other classes directly at this point...
 """
 
 class PointNode:
@@ -145,7 +149,17 @@ class TreeLandscape:
             * A k-ary tree must have the following attributes: levels, minimum_height, level_height
             * A k-ary tree must have the following members: total_height(), export_pointnode_coordinates()
     """
-    def __init__(self, treeclass, levels, minimum_height = 0.0, level_height = 0.0, boundary_factor = 2.0) -> None:
+    def __init__(self, treeclass = BinaryTree, levels = 3, minimum_height = 0.0, level_height = 0.0, boundary_factor = 2.0) -> None:
+        """
+        Constructor for the TreeLandscape class
+
+        Parameters:
+            treeclass (class): Type of tree that should be used to build the landscape. Defaults to BinaryTree.
+            levels (int): Number of levels to give the treeclass. Defaults to 3.
+            minimum_height (float): Value of the y-coordinate for all the minima. Defaults to 0.0.
+            level_height (float): Constant vertical shift between levels. Defaults to 1.0.
+            boundary_factor (float): Numerical factor by which the boundary global maxima are greater than the tree's maximum. Defaults to 2.0.
+        """
         self.boundary_factor = boundary_factor
         self.tree = treeclass(levels, minimum_height, level_height)
         return None
@@ -164,7 +178,7 @@ class TreeLandscape:
         # Insert the global maxima with the same x-distance as defined by the BinaryTree part
         left_xpos = tup_values[0][0] - (tup_values[1][0] - tup_values[0][0])
         right_xpos = tup_values[-1][0] + (tup_values[-1][0] - tup_values[-2][0])
-        global_max = self.boundary_factor * self.tree.total_height()
+        global_max = self.boundary_factor * (self.tree.minimum_height + self.tree.total_height())
         tup_values.insert(0, (left_xpos, global_max))
         tup_values.append( (right_xpos, global_max) )
 
