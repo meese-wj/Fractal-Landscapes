@@ -135,9 +135,16 @@ class BinaryTree:
         return tup_values
         
 
-
 class TreeLandscape:
+    """
+    Class that converts a k-ary tree structure into a well-defined energy landscape.
 
+    Attributes:
+        boundary_factor (float): the factor by which the boundary points (which are global maxima) are greater than tree's total height
+        tree (k-ary tree): the k-ary tree that defines a set of PointNodes.
+            * A k-ary tree must have the following attributes: levels, minimum_height, level_height
+            * A k-ary tree must have the following members: total_height(), export_pointnode_coordinates()
+    """
     def __init__(self, treeclass, levels, minimum_height = 0.0, level_height = 0.0, boundary_factor = 2.0) -> None:
         self.boundary_factor = boundary_factor
         self.tree = treeclass(levels, minimum_height, level_height)
@@ -157,7 +164,7 @@ class TreeLandscape:
         # Insert the global maxima with the same x-distance as defined by the BinaryTree part
         left_xpos = tup_values[0][0] - (tup_values[1][0] - tup_values[0][0])
         right_xpos = tup_values[-1][0] + (tup_values[-1][0] - tup_values[-2][0])
-        global_max = self.boundary_factor * self.total_height
+        global_max = self.boundary_factor * self.tree.total_height()
         tup_values.insert(0, (left_xpos, global_max))
         tup_values.append( (right_xpos, global_max) )
 
