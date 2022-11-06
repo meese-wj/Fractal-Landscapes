@@ -32,6 +32,15 @@ class PointNode:
         self.position = (xposition, yposition)
         return None
 
+    def __str__(self) -> str:
+        """
+        Print representation string for the PointNode class.
+        """
+        maxstr = "max"
+        if not self.ismax:
+            maxstr = "min"
+        return "Node (" + maxstr + ") at (" + str(self.position[0]) + ", " + str(self.position[1]) + ")"
+
 class BinaryTree:
     """
     This is the first tree of the k-ary trees, basically just 
@@ -134,7 +143,7 @@ class BinaryTree:
             tup_values.append( pn.position )
         
         # Sort them based on the xvalues
-        tup_values.sort( key = lambda idx: tup_values.index(idx[0]) )
+        tup_values.sort( key = lambda tup: tup[0] )
         
         return tup_values
         
@@ -162,7 +171,7 @@ class TreeLandscape:
         """
         if boundary_factor <= 1.0:
             raise ValueError("The boundary_factor must be greater than 1.0 for a well-defined energy landscape.")
-            
+
         self.boundary_factor = boundary_factor
         self.tree = treeclass(levels, minimum_height, level_height)
         return None
