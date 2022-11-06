@@ -74,6 +74,7 @@ class BinaryTree:
         return None
 
     def total_height(self) -> float:
+        print(self.levels, self.level_height)
         return (self.levels + 1) * self.level_height
 
     def total_width(self) -> float:
@@ -158,7 +159,7 @@ class TreeLandscape:
             * A k-ary tree must have the following attributes: levels, minimum_height, level_height
             * A k-ary tree must have the following members: total_height(), export_pointnode_coordinates()
     """
-    def __init__(self, treeclass = BinaryTree, levels = 3, minimum_height = 0.0, level_height = 0.0, boundary_factor = 2.0) -> None:
+    def __init__(self, treeclass = BinaryTree, levels = 3, minimum_height = 0.0, level_height = 1.0, boundary_factor = 2.0) -> None:
         """
         Constructor for the TreeLandscape class
 
