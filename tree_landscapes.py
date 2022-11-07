@@ -32,6 +32,18 @@ class PointNode:
         self.position = (xposition, yposition)
         return None
 
+    def xposition(self) -> float:
+        """
+        Getter for the x position.
+        """
+        return self.position[0]
+
+    def yposition(self) -> float:
+        """
+        Getter for the y position.
+        """
+        return self.position[1]
+
     def __str__(self) -> str:
         """
         Print representation string for the PointNode class.
@@ -75,7 +87,7 @@ class BinaryTree:
 
     def total_height(self) -> float:
         print(self.levels, self.level_height)
-        return (self.levels + 1) * self.level_height
+        return self.levels * self.level_height
 
     def total_width(self) -> float:
         return self.base**(self.levels)
@@ -116,9 +128,9 @@ class BinaryTree:
                     left_index = self.base * ndx
                     right_index = left_index + 1
                     # Average the daughter x positions
-                    xpos = ( daughter_nodes[left_index].position[0] + daughter_nodes[right_index].position[1] ) / self.base
+                    xpos = ( daughter_nodes[left_index].xposition() + daughter_nodes[right_index].xposition() ) / self.base
                     # Add the level_height to the daughter y position
-                    ypos = daughter_nodes[left_index].position[0] + self.level_height
+                    ypos = daughter_nodes[left_index].yposition() + self.level_height
                     current_nodes.append( PointNode(False, xpos, ypos) )
 
             level_nodes.append(current_nodes)
