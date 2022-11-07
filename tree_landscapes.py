@@ -63,20 +63,22 @@ class BinaryTree:
         base (int): the k of the k-ary. For this tree is is always 2.
         levels (int): number of levels on the tree.
         minimum_height (float): value of the minima on the tree. Zero by default.
-        level_height (float): step value to separate levels on the tree. 1 by default.
+        level_height (float): (exponential) step value to separate levels on the tree. 4.0 by default.
         pointnodes (list of PointNodes): all the PointNodes on the tree.
     """
-    def __init__(self, levels, minimum_height = 0.0, level_height = 1.0) -> None:
+    def __init__(self, levels, minimum_height = 0.0, level_height = 4.0) -> None:
         """
         Constructor for the BinaryTree.
 
         Parameters:
             levels (int): number of levels on the tree.
             minimum_height (float): value of the y-coordinate for all the minima. Zero by default.
-            level_height (float): constant vertical shift between levels. 1.0 by default.
+            level_height (float): base of the exponential vertical shift between levels. 4.0 by default.
         """
         if (not type(levels) is int) or levels <= 0:
             raise ValueError("The number of levels must be a positive integer.")
+        if level_height <= 1.0:
+            raise ValueError("The level_height parameter must make the levels grow in size (>= 1.0).")
 
         self.base = 2
         self.levels = levels
@@ -86,8 +88,7 @@ class BinaryTree:
         return None
 
     def total_height(self) -> float:
-        print(self.levels, self.level_height)
-        return self.levels * self.level_height
+        return self.level_height ** (self.levels - 1)
 
     def total_width(self) -> float:
         return self.base**(self.levels)
@@ -129,8 +130,13 @@ class BinaryTree:
                     right_index = left_index + 1
                     # Average the daughter x positions
                     xpos = ( daughter_nodes[left_index].xposition() + daughter_nodes[right_index].xposition() ) / self.base
-                    # Add the level_height to the daughter y position
-                    ypos = daughter_nodes[left_index].yposition() + self.level_height
+                    # Multiply the daughter y position by level_height unless 
+                    # the daughter was the minimum.
+                    ypos = daughter_nodes[left_index].yposition()
+                    if ypos == self.minimum_height:
+                        ypos += self.level_height**0.0 # fancy way to write 1.0
+                    else:
+                        ypos *= self.level_height
                     current_nodes.append( PointNode(False, xpos, ypos) )
 
             level_nodes.append(current_nodes)
@@ -179,7 +185,7 @@ class TreeLandscape:
             treeclass (class): Type of tree that should be used to build the landscape. Defaults to BinaryTree.
             levels (int): Number of levels to give the treeclass. Defaults to 3.
             minimum_height (float): Value of the y-coordinate for all the minima. Defaults to 0.0.
-            level_height (float): Constant vertical shift between levels. Defaults to 1.0.
+            level_height (float): (exponential) step value to separate levels on the tree. Defaults to 4.0.
             boundary_factor (float): Numerical factor by which the boundary global maxima are greater than the tree's maximum. Defaults to 2.0.
         """
         if boundary_factor <= 1.0:
