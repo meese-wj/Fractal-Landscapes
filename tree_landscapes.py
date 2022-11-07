@@ -177,7 +177,7 @@ class TreeLandscape:
             * A k-ary tree must have the following attributes: levels, minimum_height, level_height
             * A k-ary tree must have the following members: total_height(), export_pointnode_coordinates()
     """
-    def __init__(self, treeclass = BinaryTree, levels = 3, minimum_height = 0.0, level_height = 1.0, boundary_factor = 2.0) -> None:
+    def __init__(self, treeclass = BinaryTree, levels = 3, minimum_height = 0.0, level_height = 4.0, boundary_factor = None) -> None:
         """
         Constructor for the TreeLandscape class
 
@@ -186,8 +186,10 @@ class TreeLandscape:
             levels (int): Number of levels to give the treeclass. Defaults to 3.
             minimum_height (float): Value of the y-coordinate for all the minima. Defaults to 0.0.
             level_height (float): (exponential) step value to separate levels on the tree. Defaults to 4.0.
-            boundary_factor (float): Numerical factor by which the boundary global maxima are greater than the tree's maximum. Defaults to 2.0.
+            boundary_factor (float): Numerical factor by which the boundary global maxima are greater than the tree's maximum. Defaults to level_height.
         """
+        if boundary_factor == None:
+            boundary_factor = level_height
         if boundary_factor <= 1.0:
             raise ValueError("The boundary_factor must be greater than 1.0 for a well-defined energy landscape.")
 
